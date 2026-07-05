@@ -12,7 +12,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
 export default function Dashboard() {
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [selectedCode, setSelectedCode] = useState<string>('005930'); // default 삼성전자
+  const [selectedCode, setSelectedCode] = useState<string>('000660'); // default SK하이닉스
   const [pollingInterval, setPollingInterval] = useState<number>(5000); // default 5초
 
   // 테마 초기화 및 변경
