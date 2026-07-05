@@ -11,6 +11,12 @@
   padding: 24px;
 }
 
+@media (max-width: 768px) {
+  .weatherCard {
+    padding: 16px;
+  }
+}
+
 .decorCircle {
   position: absolute;
   top: -40px;
@@ -30,6 +36,13 @@
   margin-bottom: 24px;
 }
 
+@media (max-width: 768px) {
+  .weatherHeader {
+    margin-bottom: 16px;
+    gap: 12px;
+  }
+}
+
 .weatherIconWrapper {
   width: 48px;
   height: 48px;
@@ -40,12 +53,19 @@
   justify-content: center;
   color: var(--primary);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+  flex-shrink: 0;
 }
 
 .weatherTitle {
   font-size: 18px;
   font-weight: 600;
   color: var(--text-primary);
+}
+
+@media (max-width: 768px) {
+  .weatherTitle {
+    font-size: 16px;
+  }
 }
 
 .weatherSubtitle {
@@ -106,9 +126,15 @@
   transform: scale(0.98);
 }
 
-/* Indicators Grid */
+/* ─── Indicators Grid ─── */
 .statsCard {
   padding: 20px;
+}
+
+@media (max-width: 768px) {
+  .statsCard {
+    padding: 14px;
+  }
 }
 
 .statsTitle {
@@ -122,14 +148,27 @@
 
 .statsGrid {
   display: grid;
-  grid-template-cols: 1fr 1fr;
+  /* 오타 수정: grid-template-cols → grid-template-columns */
+  grid-template-columns: 1fr 1fr;
   gap: 12px;
+}
+
+@media (max-width: 480px) {
+  .statsGrid {
+    gap: 8px;
+  }
 }
 
 .statItem {
   background: var(--surface-container-low);
   border-radius: 12px;
   padding: 12px;
+}
+
+@media (max-width: 480px) {
+  .statItem {
+    padding: 10px;
+  }
 }
 
 .statLabel {
@@ -140,7 +179,13 @@
 }
 
 .statValue {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 700;
   color: var(--text-primary);
+}
+
+@media (max-width: 480px) {
+  .statValue {
+    font-size: 14px;
+  }
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from './StockList.module.css';
 
 interface StockData {
@@ -24,10 +24,38 @@ export default function StockList({
   selectedCode,
   onSelect,
 }: StockListProps) {
+  // 모바일에서는 기본적으로 접힌 상태, 데스크탑에서는 펼친 상태
+  const [isOpen, setIsOpen] = useState(true);
+
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 768px)');
+    const handleChange = (e: MediaQueryListEvent | MediaQueryList) => {
+      setIsOpen(!e.matches);
+    };
+    handleChange(mq);
+    mq.addEventListener('change', handleChange);
+    return () => mq.removeEventListener('change', handleChange);
+  }, []);
+
   return (
     <div className={styles.container}>
-      <h3 className={styles.title}>오늘의 시가총액 TOP 10</h3>
-      <div className={styles.list}>
+      {/* 제목 + 토글 버튼 */}
+      <button
+        className={styles.titleRow}
+        onClick={() => setIsOpen((prev) => !prev)}
+        aria-expanded={isOpen}
+      >
+        <h3 className={styles.title}>오늘의 시가총액 TOP 10</h3>
+        <span
+          className={styles.chevron}
+          style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}
+        >
+          ▾
+        </span>
+      </button>
+
+      {/* 접히는 영역 */}
+      <div className={`${styles.list} ${isOpen ? styles.listOpen : styles.listClosed}`}>
         {stocks.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '20px', color: 'var(--text-secondary)' }}>
             데이터를 불러오는 중입니다...
@@ -36,7 +64,7 @@ export default function StockList({
           stocks.map((stock) => {
             const isUp = stock.direction === '2';
             const isDown = stock.direction === '5';
-            
+
             let badgeClass = styles.flat;
             let sign = '';
             let icon = '';

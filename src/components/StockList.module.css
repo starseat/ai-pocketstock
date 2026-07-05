@@ -1,26 +1,62 @@
 .container {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 0;
   width: 100%;
+}
+
+/* 제목 + 토글 버튼 행 */
+.titleRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px 4px 12px 4px;
+  text-align: left;
+}
+
+.titleRow:hover .chevron {
+  color: var(--primary);
 }
 
 .title {
   font-size: 14px;
   font-weight: 600;
   color: var(--text-secondary);
-  padding: 0 4px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 
+.chevron {
+  font-size: 18px;
+  color: var(--text-secondary);
+  transition: transform 0.25s ease, color 0.2s;
+  user-select: none;
+}
+
+/* 펼쳐진 리스트 */
 .list {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  max-height: 480px;
-  overflow-y: auto;
+  overflow: hidden;
+  transition: max-height 0.3s ease, opacity 0.3s ease;
   padding-right: 4px;
+}
+
+.listOpen {
+  max-height: 520px;
+  opacity: 1;
+  overflow-y: auto;
+}
+
+.listClosed {
+  max-height: 0;
+  opacity: 0;
+  pointer-events: none;
 }
 
 .item {

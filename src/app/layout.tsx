@@ -1,7 +1,15 @@
 import type { Metadata } from "next";
+import type { Viewport } from "next";
 import "./globals.css";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? "https://ai-pocketstock.vercel.app";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+};
 
 export const metadata: Metadata = {
   title: "PocketStock - 종목분석",

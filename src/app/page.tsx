@@ -34,7 +34,7 @@ export default function Dashboard() {
   };
 
   // SWR 실시간 데이터 폴링 설정
-  const { data, error, isLoading } = useSWR('/api/stocks', fetcher, {
+  const { data, error } = useSWR('/api/stocks', fetcher, {
     refreshInterval: pollingInterval,
     revalidateOnFocus: true,
     dedupingInterval: 2000,
@@ -64,17 +64,18 @@ export default function Dashboard() {
 
       {/* Main Container */}
       <div
+        className="dashboard-main"
         style={{
           paddingTop: '88px',
-          paddingBottom: '32px',
-          paddingLeft: 'max(20px, env(safe-area-inset-left))',
-          paddingRight: 'max(20px, env(safe-area-inset-right))',
+          paddingBottom: '48px',
+          paddingLeft: 'max(16px, env(safe-area-inset-left))',
+          paddingRight: 'max(16px, env(safe-area-inset-right))',
           maxWidth: '1600px',
           margin: '0 auto',
           minHeight: '100vh',
           display: 'flex',
           flexDirection: 'column',
-          gap: '24px',
+          gap: '20px',
         }}
       >
         {/* Error Alert Box */}
@@ -95,15 +96,7 @@ export default function Dashboard() {
         )}
 
         {/* Layout Grid (Responsive 3-Column layout) */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'minmax(280px, 320px) 1fr minmax(280px, 320px)',
-            gap: '24px',
-            alignItems: 'start',
-          }}
-          className="dashboard-grid"
-        >
+        <div className="dashboard-grid">
           {/* Left Column: Ticker list */}
           <div className="glass-card" style={{ padding: '16px' }}>
             <StockList
@@ -126,18 +119,28 @@ export default function Dashboard() {
       </div>
 
       {/* Responsive Layout CSS helper */}
-      <style jsx global>{`
+      <style>{`
+        .dashboard-grid {
+          display: grid;
+          grid-template-columns: minmax(260px, 320px) 1fr minmax(260px, 320px);
+          gap: 20px;
+          align-items: start;
+        }
         @media (max-width: 1200px) {
           .dashboard-grid {
-            grid-template-columns: 320px 1fr !important;
+            grid-template-columns: 300px 1fr !important;
           }
           .dashboard-grid > div:last-child {
             grid-column: span 2;
           }
         }
         @media (max-width: 768px) {
+          .dashboard-main {
+            padding-top: 72px !important;
+          }
           .dashboard-grid {
             grid-template-columns: 1fr !important;
+            gap: 12px !important;
           }
           .dashboard-grid > div {
             grid-column: span 1 !important;

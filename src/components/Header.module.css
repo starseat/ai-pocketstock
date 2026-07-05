@@ -18,7 +18,8 @@
 
 @media (max-width: 768px) {
   .header {
-    padding: 0 20px;
+    padding: 0 16px;
+    height: 56px;
   }
 }
 
@@ -33,6 +34,13 @@
   font-weight: 700;
   color: var(--primary);
   font-family: 'Outfit', sans-serif;
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .logo {
+    font-size: 20px;
+  }
 }
 
 .searchArea {
@@ -85,14 +93,27 @@
 .actions {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
+}
+
+/* 모바일: "갱신 주기" 텍스트 레이블 숨김 */
+.intervalLabel {
+  font-size: 12px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .intervalLabel {
+    display: none;
+  }
 }
 
 .controlButton {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 16px;
+  padding: 8px 14px;
   border-radius: 9999px;
   border: 1px solid var(--card-border);
   background: transparent;
@@ -101,6 +122,20 @@
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .controlButton {
+    padding: 7px 10px;
+    font-size: 13px;
+    gap: 4px;
+  }
+
+  /* 모바일에서 "어둡게/밝게" 텍스트 숨김, 아이콘만 표시 */
+  .controlButton span {
+    display: none;
+  }
 }
 
 .controlButton:hover {
@@ -112,7 +147,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 6px 12px;
+  padding: 6px 10px;
   border-radius: 12px;
   border: 1px solid var(--card-border);
   background: var(--card-bg);
@@ -122,6 +157,13 @@
   cursor: pointer;
   outline: none;
   transition: all 0.2s;
+}
+
+@media (max-width: 768px) {
+  .intervalSelector {
+    font-size: 12px;
+    padding: 5px 6px;
+  }
 }
 
 .intervalSelector:focus {

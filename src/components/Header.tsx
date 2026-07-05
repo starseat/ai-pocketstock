@@ -95,7 +95,7 @@ export default function Header({
       <div className={styles.actions}>
         {/* Polling Interval Selector */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>갱신 주기</span>
+          <span className={styles.intervalLabel}>갱신 주기</span>
           <select
             className={styles.intervalSelector}
             value={pollingInterval}
