@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+
+<html class="light" lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>PocketStock - 종목분석</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Outfit:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-error-container": "#93000a",
+                        "on-primary-fixed-variant": "#0033c1",
+                        "on-secondary": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "surface": "#f7f9ff",
+                        "on-secondary-container": "#334286",
+                        "inverse-surface": "#2d3135",
+                        "on-surface": "#181c20",
+                        "surface-container": "#ebeef3",
+                        "secondary-container": "#a3b2fe",
+                        "secondary": "#4b5a9f",
+                        "surface-container-high": "#e5e8ee",
+                        "secondary-fixed": "#dee1ff",
+                        "on-secondary-fixed": "#001257",
+                        "tertiary-fixed": "#ffdbce",
+                        "surface-bright": "#f7f9ff",
+                        "primary-container": "#375dfb",
+                        "secondary-fixed-dim": "#b9c3ff",
+                        "on-error": "#ffffff",
+                        "on-primary-container": "#f1f1ff",
+                        "on-background": "#181c20",
+                        "on-primary-fixed": "#001257",
+                        "on-tertiary-container": "#ffefe9",
+                        "surface-container-highest": "#e0e3e8",
+                        "on-secondary-fixed-variant": "#334186",
+                        "tertiary-fixed-dim": "#ffb599",
+                        "on-primary": "#ffffff",
+                        "outline": "#747687",
+                        "on-tertiary-fixed-variant": "#7f2b00",
+                        "tertiary": "#983500",
+                        "tertiary-container": "#c14500",
+                        "primary-fixed-dim": "#b9c3ff",
+                        "on-surface-variant": "#444656",
+                        "inverse-on-surface": "#eef1f6",
+                        "surface-tint": "#1f4beb",
+                        "primary": "#0a40e2",
+                        "surface-dim": "#d7dadf",
+                        "error": "#ba1a1a",
+                        "on-tertiary-fixed": "#370e00",
+                        "outline-variant": "#c4c5d8",
+                        "inverse-primary": "#b9c3ff",
+                        "error-container": "#ffdad6",
+                        "primary-fixed": "#dee1ff",
+                        "background": "#f7f9ff",
+                        "on-tertiary": "#ffffff",
+                        "surface-variant": "#e0e3e8",
+                        "surface-container-low": "#f1f4f9",
+                        "krx-up": "#FF6B6B",
+                        "krx-down": "#4DABF7",
+                        "krx-up-bg": "rgba(255, 107, 107, 0.1)",
+                        "krx-down-bg": "rgba(77, 171, 247, 0.1)"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "2xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                    spacing: {
+                        "container-padding-desktop": "40px",
+                        "gutter": "24px",
+                        "card-gap": "16px",
+                        "container-padding-mobile": "20px",
+                        "unit": "4px"
+                    },
+                    fontFamily: {
+                        "title-lg": ["Inter", "sans-serif"],
+                        "body-lg": ["Inter", "sans-serif"],
+                        "body-md": ["Inter", "sans-serif"],
+                        "headline-lg": ["Outfit", "sans-serif"],
+                        "headline-lg-mobile": ["Outfit", "sans-serif"],
+                        "label-md": ["Inter", "sans-serif"],
+                        "headline-md": ["Outfit", "sans-serif"],
+                        "display-lg": ["Outfit", "sans-serif"]
+                    },
+                    fontSize: {
+                        "title-lg": ["20px", { lineHeight: "28px", fontWeight: "600" }],
+                        "body-lg": ["16px", { lineHeight: "24px", fontWeight: "400" }],
+                        "body-md": ["14px", { lineHeight: "20px", fontWeight: "400" }],
+                        "headline-lg": ["32px", { lineHeight: "40px", letterSpacing: "-0.01em", fontWeight: "600" }],
+                        "headline-lg-mobile": ["24px", { lineHeight: "32px", fontWeight: "600" }],
+                        "label-md": ["12px", { lineHeight: "16px", letterSpacing: "0.01em", fontWeight: "500" }],
+                        "headline-md": ["24px", { lineHeight: "32px", fontWeight: "600" }],
+                        "display-lg": ["48px", { lineHeight: "56px", letterSpacing: "-0.02em", fontWeight: "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+            transition: background 0.3s, border-color 0.3s, box-shadow 0.3s;
+        }
+        
+        .dark .glass-card {
+            background: rgba(24, 28, 32, 0.75);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Candlestick styles for vanilla CSS */
+        .candle-up { background-color: #FF6B6B; border: 1px solid #FF6B6B; }
+        .candle-down { background-color: #4DABF7; border: 1px solid #4DABF7; }
+        .wick { width: 1px; position: absolute; left: 50%; transform: translateX(-50%); }
+        .wick-up { background-color: #FF6B6B; }
+        .wick-down { background-color: #4DABF7; }
+        
+        /* Custom scrollbar for webkit */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #e0e3e8; border-radius: 4px; }
+        .dark ::-webkit-scrollbar-thumb { background: #444656; }
+        ::-webkit-scrollbar-thumb:hover { background: #c4c5d8; }
+        
+        /* Hide scrollbar utility */
+        .scrollbar-none::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-none {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="bg-surface dark:bg-[#0f1115] text-on-surface dark:text-[#f8fafc] font-body-md min-h-screen overflow-x-hidden selection:bg-primary-container selection:text-on-primary-container transition-colors duration-300">
+
+<!-- TopNavBar -->
+<header class="fixed top-0 w-full z-50 flex justify-between items-center px-container-padding-mobile md:px-container-padding-desktop h-16 bg-surface/80 dark:bg-[#0f1115]/80 backdrop-blur-xl border-b border-white/20 dark:border-white/5 shadow-sm transition-all duration-300">
+    <div class="flex items-center gap-3 md:gap-8">
+        <!-- Hamburger Menu Button (Mobile) -->
+        <button id="mobile-menu-btn" class="md:hidden p-1.5 rounded-xl hover:bg-surface-container-high dark:hover:bg-[#1e222b] text-on-surface-variant dark:text-slate-400">
+            <span class="material-symbols-outlined text-[24px]">menu</span>
+        </button>
+        <h1 class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-container">PocketStock</h1>
+        <nav class="hidden md:flex items-center gap-6">
+            <a class="text-primary dark:text-primary-container font-bold border-b-2 border-primary dark:border-primary-container pb-1" href="#">
+                <span class="font-label-md text-label-md">종목분석</span>
+            </a>
+            <a class="text-on-surface-variant dark:text-slate-400 font-medium hover:text-primary dark:hover:text-primary-container transition-colors duration-200" href="#">
+                <span class="font-label-md text-label-md">시장분석</span>
+            </a>
+        </nav>
+    </div>
+    
+    <!-- Search Input (Tablet/Desktop) -->
+    <div class="relative flex-1 max-w-md mx-8 hidden md:block group">
+        <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline-variant group-focus-within:text-primary transition-colors">search</span>
+        <input id="desktop-search-input" class="w-full bg-surface-container-low dark:bg-[#1e222b] border-none rounded-xl pl-12 pr-10 py-2.5 font-body-md text-on-surface dark:text-[#f8fafc] focus:ring-2 focus:ring-primary/20 dark:focus:ring-primary-container/20 transition-all shadow-inner" placeholder="종목 검색 또는 선택..." type="text" value="SK하이닉스 (000660)"/>
+        
+        <!-- Suggestions Dropdown (Desktop) -->
+        <div id="desktop-suggestions" class="absolute left-0 right-0 mt-2 bg-white dark:bg-[#1e222b] rounded-2xl shadow-xl border border-surface-container-highest dark:border-white/5 overflow-hidden hidden z-50">
+            <div class="p-2 flex flex-col gap-1">
+                <button class="flex justify-between items-center py-2.5 px-4 rounded-xl hover:bg-surface-container-low dark:hover:bg-slate-800 text-left w-full" onclick="selectStock('SK하이닉스', '000660', true, '234,500', '4,500 (+1.96%)', true)">
+                    <span class="font-body-md text-on-surface dark:text-[#f8fafc] font-semibold">SK하이닉스 (000660)</span>
+                    <span class="font-label-md text-krx-up">234,500 (+1.96%)</span>
+                </button>
+                <button class="flex justify-between items-center py-2.5 px-4 rounded-xl hover:bg-surface-container-low dark:hover:bg-slate-800 text-left w-full" onclick="selectStock('삼성전자', '005930', false, '78,200', '400 (-0.51%)', false)">
+                    <span class="font-body-md text-on-surface dark:text-[#f8fafc] font-semibold">삼성전자 (005930)</span>
+                    <span class="font-label-md text-krx-down">78,200 (-0.51%)</span>
+                </button>
+                <button class="flex justify-between items-center py-2.5 px-4 rounded-xl hover:bg-surface-container-low dark:hover:bg-slate-800 text-left w-full" onclick="selectStock('NAVER', '035420', true, '185,400', '1,500 (+0.83%)', true)">
+                    <span class="font-body-md text-on-surface dark:text-[#f8fafc] font-semibold">NAVER (035420)</span>
+                    <span class="font-label-md text-krx-up">185,400 (+0.83%)</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="flex items-center gap-2 md:gap-4">
+        <!-- Mobile Search Button -->
+        <button id="mobile-search-btn" class="md:hidden p-1.5 rounded-xl hover:bg-surface-container-high dark:hover:bg-[#1e222b] text-on-surface-variant dark:text-slate-400">
+            <span class="material-symbols-outlined text-[24px]">search</span>
+        </button>
+        <!-- Theme Toggle Button -->
+        <button id="theme-toggle-btn" class="flex items-center gap-2 px-3 py-1.5 rounded-full hover:bg-surface-container-high dark:hover:bg-[#1e222b] transition-colors text-on-surface-variant dark:text-slate-400">
+            <span id="theme-icon" class="material-symbols-outlined text-[20px]" data-weight="fill" style="font-variation-settings: 'FILL' 1;">dark_mode</span>
+            <span id="theme-text" class="font-label-md text-label-md hidden sm:block">어둡게</span>
+        </button>
+        <!-- Profile Avatar -->
+        <div class="w-8 h-8 rounded-full overflow-hidden border-2 border-surface-container-highest dark:border-white/10 flex-shrink-0">
+            <img alt="User Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBS9oE9yznpJHX8V8NFQx1k1b-QT5ySKa9refbWpwa5y6mC5o4CWehrRaWi-WODQ6PLZ7maDi8gatpJXxnfxuVqD6dAQxgItBmZ9PA26yczf9DhjXBFpqlaH-7mDVwro9tGz0gPQXDIGHxfAJHfCaW42cZFrIr1XanREaWHIZD0rGPRivc_zQkS5Y7FEIeBNOq5xzXRB0lEyXefuwdLli_VES64kPQir6bUDMS6DnwrXO_JSPl_IiR0A5dJfUuhQKw6BAdqh1x80PlK"/>
+        </div>
+    </div>
+</header>
+
+<!-- Mobile Navigation Drawer -->
+<div id="mobile-drawer" class="fixed inset-0 z-[100] bg-black/40 backdrop-blur-sm opacity-0 pointer-events-none transition-all duration-300 md:hidden">
+    <div class="fixed top-0 left-0 bottom-0 w-64 bg-surface dark:bg-[#0f1115] shadow-2xl p-6 flex flex-col gap-6 transform -translate-x-full transition-transform duration-300">
+        <div class="flex justify-between items-center border-b border-surface-container-highest dark:border-white/10 pb-4">
+            <h2 class="font-headline-md text-primary dark:text-primary-container font-bold">PocketStock</h2>
+            <button id="close-drawer-btn" class="p-1 rounded-lg hover:bg-surface-container-high dark:hover:bg-[#1e222b] text-on-surface-variant dark:text-slate-400">
+                <span class="material-symbols-outlined text-[20px]">close</span>
+            </button>
+        </div>
+        <nav class="flex flex-col gap-3">
+            <a class="text-primary dark:text-primary-container font-bold bg-primary/10 dark:bg-primary-container/10 px-4 py-3 rounded-xl flex items-center gap-3" href="#">
+                <span class="material-symbols-outlined text-[22px]">analytics</span>
+                <span class="font-label-md text-body-md">종목분석</span>
+            </a>
+            <a class="text-on-surface-variant dark:text-slate-400 font-medium hover:bg-surface-container-low dark:hover:bg-[#1e222b] px-4 py-3 rounded-xl flex items-center gap-3 transition-colors" href="#">
+                <span class="material-symbols-outlined text-[22px]">leaderboard</span>
+                <span class="font-label-md text-body-md">시장분석</span>
+            </a>
+        </nav>
+    </div>
+</div>
+
+<!-- Mobile Search Overlay -->
+<div id="mobile-search-overlay" class="fixed inset-0 z-[100] bg-surface dark:bg-[#0f1115] opacity-0 pointer-events-none transition-all duration-300 p-container-padding-mobile md:hidden flex flex-col gap-4">
+    <div class="flex items-center gap-3">
+        <button id="close-search-btn" class="p-1.5 rounded-xl hover:bg-surface-container-high dark:hover:bg-[#1e222b] text-on-surface-variant dark:text-slate-400">
+            <span class="material-symbols-outlined text-[24px]">arrow_back</span>
+        </button>
+        <div class="relative flex-1">
+            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline-variant">search</span>
+            <input id="mobile-search-input" class="w-full bg-surface-container-low dark:bg-[#1e222b] border-none rounded-xl pl-12 pr-4 py-2.5 font-body-md text-on-surface dark:text-[#f8fafc] focus:ring-2 focus:ring-primary/20" placeholder="종목 검색 또는 선택..." type="text" value="SK하이닉스 (000660)"/>
+        </div>
+    </div>
+    
+    <div class="mt-4 flex-1 overflow-y-auto">
+        <h3 class="font-label-md text-label-md text-on-surface-variant dark:text-slate-400 font-bold mb-2 px-2">인기 검색 종목</h3>
+        <div class="flex flex-col gap-1.5">
+            <button class="flex justify-between items-center py-3 px-4 rounded-xl hover:bg-surface-container-low dark:hover:bg-[#1e222b] text-left w-full transition-colors" onclick="selectStock('SK하이닉스', '000660', true, '234,500', '4,500 (+1.96%)', true); closeMobileSearch();">
+                <span class="font-body-md text-on-surface dark:text-[#f8fafc] font-semibold">SK하이닉스 (000660)</span>
+                <span class="font-label-md text-krx-up">234,500 (+1.96%)</span>
+            </button>
+            <button class="flex justify-between items-center py-3 px-4 rounded-xl hover:bg-surface-container-low dark:hover:bg-[#1e222b] text-left w-full transition-colors" onclick="selectStock('삼성전자', '005930', false, '78,200', '400 (-0.51%)', false); closeMobileSearch();">
+                <span class="font-body-md text-on-surface dark:text-[#f8fafc] font-semibold">삼성전자 (005930)</span>
+                <span class="font-label-md text-krx-down">78,200 (-0.51%)</span>
+            </button>
+            <button class="flex justify-between items-center py-3 px-4 rounded-xl hover:bg-surface-container-low dark:hover:bg-[#1e222b] text-left w-full transition-colors" onclick="selectStock('NAVER', '035420', true, '185,400', '1,500 (+0.83%)', true); closeMobileSearch();">
+                <span class="font-body-md text-on-surface dark:text-[#f8fafc] font-semibold">NAVER (035420)</span>
+                <span class="font-label-md text-krx-up">185,400 (+0.83%)</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="pt-20 pb-8 px-container-padding-mobile md:px-container-padding-desktop max-w-[1600px] mx-auto min-h-screen flex flex-col lg:flex-row gap-gutter">
+    <!-- Left/Main Canvas: Chart Area -->
+    <main class="flex-1 flex flex-col gap-card-gap min-w-0">
+        <!-- Chart Toolbar (Responsive Horizontally Scrollable on Mobile) -->
+        <div class="glass-card rounded-2xl p-4 flex items-center justify-start lg:justify-between gap-4 overflow-x-auto lg:overflow-x-visible flex-nowrap lg:flex-wrap scrollbar-none">
+            <div class="flex items-center gap-6 flex-shrink-0">
+                <!-- Timeframe Sliding Pill -->
+                <div class="bg-surface-container-low dark:bg-[#1e222b] p-1 rounded-full flex relative shadow-inner w-32 flex-shrink-0">
+                    <div id="timeframe-slider" class="absolute w-1/2 h-[calc(100%-8px)] bg-white dark:bg-slate-700 rounded-full shadow-sm left-1 top-1 transition-transform duration-300 translate-x-full"></div>
+                    <button id="tab-daily" class="flex-1 relative z-10 text-center font-label-md text-label-md py-1.5 text-on-surface-variant dark:text-slate-400" onclick="toggleTimeframe('일봉')">일봉</button>
+                    <button id="tab-min" class="flex-1 relative z-10 text-center font-label-md text-label-md py-1.5 font-bold text-primary dark:text-primary-container" onclick="toggleTimeframe('분봉')">분봉</button>
+                </div>
+                <!-- Moving Averages -->
+                <div class="flex items-center gap-4 px-4 border-l border-surface-container-highest dark:border-white/10 flex-shrink-0">
+                    <div class="flex items-center gap-1 group cursor-pointer" onclick="toggleLine('ma5')">
+                        <span id="dot-ma5" class="w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.5)]"></span>
+                        <span class="font-label-md text-label-md text-on-surface-variant dark:text-slate-400 group-hover:text-on-surface dark:group-hover:text-slate-200">5</span>
+                    </div>
+                    <div class="flex items-center gap-1 group cursor-pointer" onclick="toggleLine('ma10')">
+                        <span id="dot-ma10" class="w-2.5 h-2.5 rounded-full bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.5)]"></span>
+                        <span class="font-label-md text-label-md text-on-surface-variant dark:text-slate-400 group-hover:text-on-surface dark:group-hover:text-slate-200">10</span>
+                    </div>
+                    <div class="flex items-center gap-1 group cursor-pointer" onclick="toggleLine('ma20')">
+                        <span id="dot-ma20" class="w-2.5 h-2.5 rounded-full bg-rose-400 shadow-[0_0_8px_rgba(251,113,133,0.5)]"></span>
+                        <span class="font-label-md text-label-md text-on-surface-variant dark:text-slate-400 group-hover:text-on-surface dark:group-hover:text-slate-200">20</span>
+                    </div>
+                    <div class="flex items-center gap-1 group cursor-pointer" onclick="toggleLine('ma60')">
+                        <span id="dot-ma60" class="w-2.5 h-2.5 rounded-full bg-indigo-400 shadow-[0_0_8px_rgba(129,140,248,0.5)]"></span>
+                        <span class="font-label-md text-label-md text-on-surface-variant dark:text-slate-400 group-hover:text-on-surface dark:group-hover:text-slate-200">60</span>
+                    </div>
+                    <button class="text-outline-variant hover:text-primary transition-colors" title="이평선 도움말">
+                        <span class="material-symbols-outlined text-[16px]">help</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-4 flex-nowrap lg:flex-wrap flex-shrink-0">
+                <!-- Toggles -->
+                <div class="flex items-center gap-1 bg-surface-container-low dark:bg-[#1e222b] p-1.5 rounded-xl border border-surface-container-highest/50 dark:border-white/5 flex-shrink-0">
+                    <button id="toggle-trend" class="px-3 py-1 bg-white dark:bg-slate-700 rounded-lg shadow-sm font-label-md text-label-md text-primary dark:text-[#f8fafc] font-bold border border-primary/10 dark:border-white/5 transition-all" onclick="toggleOption('trend')">추세표시</button>
+                    <button id="toggle-alltrend" class="px-3 py-1 rounded-lg hover:bg-surface-container-high dark:hover:bg-slate-800 font-label-md text-label-md text-on-surface-variant dark:text-slate-400 transition-all" onclick="toggleOption('alltrend')">전체추세</button>
+                    <button id="toggle-high" class="px-3 py-1 rounded-lg hover:bg-surface-container-high dark:hover:bg-slate-800 font-label-md text-label-md text-on-surface-variant dark:text-slate-400 transition-all" onclick="toggleOption('high')">고점</button>
+                    <button id="toggle-low" class="px-3 py-1 bg-white dark:bg-slate-700 rounded-lg shadow-sm font-label-md text-label-md text-primary dark:text-[#f8fafc] font-bold border border-primary/10 dark:border-white/5 transition-all" onclick="toggleOption('low')">저점</button>
+                </div>
+                <!-- Numeric Input -->
+                <div class="flex items-center gap-2 bg-surface-container-low dark:bg-[#1e222b] px-3 py-1.5 rounded-xl border border-surface-container-highest/50 dark:border-white/5 flex-shrink-0">
+                    <span class="font-label-md text-label-md text-on-surface-variant dark:text-slate-400">캔들 개수:</span>
+                    <div class="flex items-center bg-white dark:bg-slate-700 rounded-lg shadow-sm overflow-hidden">
+                        <button class="px-2.5 py-1 hover:bg-surface-container-low dark:hover:bg-slate-800 text-on-surface-variant dark:text-slate-400" onclick="changeCandle(-100)">-</button>
+                        <input id="candle-count-input" class="w-14 text-center border-none p-0 font-label-md text-label-md font-bold text-on-surface dark:text-[#f8fafc] focus:ring-0 bg-transparent h-6" type="text" value="2139" readonly/>
+                        <button class="px-2.5 py-1 hover:bg-surface-container-low dark:hover:bg-slate-800 text-on-surface-variant dark:text-slate-400" onclick="changeCandle(100)">+</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Chart Area (Responsive Height) -->
+        <div class="glass-card rounded-2xl p-4 md:p-6 flex flex-col gap-6 flex-1 min-h-[400px] md:min-h-[550px] lg:min-h-[600px] relative overflow-hidden">
+            <!-- Chart Header info (Fluid layout to prevent overlapping candles) -->
+            <div class="flex flex-col sm:flex-row justify-between sm:items-end gap-3 z-10 w-full">
+                <div>
+                    <h2 class="font-headline-lg text-2xl md:text-[32px] font-bold text-on-surface dark:text-[#f8fafc] flex items-center gap-3">
+                        <span id="stock-name">SK하이닉스</span>
+                        <span id="stock-code" class="font-title-lg text-lg md:text-xl text-on-surface-variant dark:text-slate-400 font-normal">000660</span>
+                    </h2>
+                    <div class="flex items-center gap-2 mt-1">
+                        <span id="stock-price" class="font-headline-md text-xl md:text-2xl text-krx-up font-bold">234,500</span>
+                        <span id="stock-diff" class="font-label-md text-label-md text-krx-up bg-krx-up-bg dark:bg-krx-up/10 px-2 py-0.5 rounded-md flex items-center gap-0.5">
+                            <span id="stock-diff-icon" class="material-symbols-outlined text-[14px]">arrow_drop_up</span> 4,500 (+1.96%)
+                        </span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Abstract Chart Container -->
+            <div class="flex-1 w-full relative mt-4 border-b border-surface-container-highest dark:border-white/10 pb-4 flex flex-col min-h-[220px] md:min-h-[350px]">
+                <!-- Background Zones -->
+                <div class="absolute inset-0 flex pointer-events-none">
+                    <div class="w-1/4 h-full bg-krx-down-bg dark:bg-krx-down/5 opacity-30"></div>
+                    <div class="w-1/2 h-full"></div>
+                    <div class="w-1/4 h-full bg-krx-up-bg dark:bg-krx-up/5 opacity-30"></div>
+                </div>
+                <!-- Horizontal Grid Lines & Labels -->
+                <div class="absolute inset-0 flex flex-col justify-between pointer-events-none z-0">
+                    <div class="w-full border-b border-surface-container-high/50 dark:border-white/5 flex justify-end"></div>
+                    <div class="w-full border-b border-surface-container-high/50 dark:border-white/5 flex justify-end"></div>
+                    <!-- Dotted red line at current price -->
+                    <div id="price-line" class="w-full border-b-2 border-dashed border-krx-up/50 absolute top-[40%] flex justify-end items-center transition-all duration-500 pr-0">
+                        <div id="price-badge" class="bg-krx-up text-white font-label-md text-[10px] md:text-label-md px-1.5 md:px-2 py-0.5 md:py-1 rounded-l-md shadow-sm z-10">234,500</div>
+                    </div>
+                    <div class="w-full border-b border-surface-container-high/50 dark:border-white/5 flex justify-end"></div>
+                    <div class="w-full border-b border-surface-container-high/50 dark:border-white/5 flex justify-end"></div>
+                </div>
+                
+                <!-- Candlesticks (Abstract Responsive Representation) -->
+                <div class="absolute inset-0 flex items-end justify-around px-2 md:px-8 pt-10 pb-4 h-[80%] bottom-[20%] z-10">
+                    <!-- Down -->
+                    <div class="relative w-2 sm:w-3 md:w-4 h-[40%]">
+                        <div class="wick wick-down h-[120%] top-[-10%]"></div>
+                        <div class="candle-down w-full h-full rounded-[1px] md:rounded-[2px] relative z-10 shadow-sm"></div>
+                    </div>
+                    <!-- Up -->
+                    <div class="relative w-2 sm:w-3 md:w-4 h-[60%] mb-[10%]">
+                        <div class="wick wick-up h-[140%] top-[-20%]"></div>
+                        <div class="candle-up w-full h-full rounded-[1px] md:rounded-[2px] relative z-10 shadow-sm"></div>
+                    </div>
+                    <!-- Down -->
+                    <div class="relative w-2 sm:w-3 md:w-4 h-[30%] mb-[30%]">
+                        <div class="wick wick-down h-[110%] top-[-5%]"></div>
+                        <div class="candle-down w-full h-full rounded-[1px] md:rounded-[2px] relative z-10 shadow-sm"></div>
+                    </div>
+                    <!-- Lowest -->
+                    <div class="relative w-2 sm:w-3 md:w-4 h-[20%] mb-[5%] group">
+                        <div class="wick wick-down h-[150%] top-[-10%]"></div>
+                        <div class="candle-down w-full h-full rounded-[1px] md:rounded-[2px] relative z-10 shadow-sm"></div>
+                        <!-- Annotation Low -->
+                        <div id="annotation-low" class="absolute bottom-[-32px] md:bottom-[-40px] left-1/2 -translate-x-1/2 whitespace-nowrap bg-surface dark:bg-[#1e222b] px-1.5 md:px-2 py-0.5 md:py-1 rounded shadow-md border border-outline-variant/30 dark:border-white/10 flex items-center gap-0.5 z-20 transition-all duration-300">
+                            <span class="material-symbols-outlined text-[12px] md:text-[14px] text-krx-down">arrow_drop_down</span>
+                            <span id="label-low" class="text-[9px] md:text-label-md font-medium text-on-surface dark:text-slate-200">최저 2,045,000 (18.58%)</span>
+                        </div>
+                    </div>
+                    <!-- Up trend -->
+                    <div class="relative w-2 sm:w-3 md:w-4 h-[50%] mb-[15%]">
+                        <div class="wick wick-up h-[130%] top-[-15%]"></div>
+                        <div class="candle-up w-full h-full rounded-[1px] md:rounded-[2px] relative z-10 shadow-sm"></div>
+                    </div>
+                    <!-- Highest -->
+                    <div class="relative w-2 sm:w-3 md:w-4 h-[80%] mb-[20%]">
+                        <div class="wick wick-up h-[120%] top-[-10%]"></div>
+                        <div class="candle-up w-full h-full rounded-[1px] md:rounded-[2px] relative z-10 shadow-sm"></div>
+                        <!-- Annotation High -->
+                        <div id="annotation-high" class="absolute top-[-40px] md:top-[-50px] left-1/2 -translate-x-1/2 whitespace-nowrap bg-surface dark:bg-[#1e222b] px-1.5 md:px-2 py-0.5 md:py-1 rounded shadow-md border border-outline-variant/30 dark:border-white/10 flex items-center gap-0.5 z-20 transition-all duration-300">
+                            <span class="material-symbols-outlined text-[12px] md:text-[14px] text-krx-up">arrow_drop_up</span>
+                            <span id="label-high" class="text-[9px] md:text-label-md font-medium text-on-surface dark:text-slate-200">최고 2,900,000 (-12.58%)</span>
+                        </div>
+                    </div>
+                    <!-- Current -->
+                    <div class="relative w-2 sm:w-3 md:w-4 h-[45%] mb-[45%]">
+                        <div class="wick wick-up h-[110%] top-[-5%]"></div>
+                        <div class="candle-up w-full h-full rounded-[1px] md:rounded-[2px] relative z-10 shadow-sm ring-2 ring-primary ring-offset-1 dark:ring-offset-slate-900"></div>
+                    </div>
+                </div>
+                
+                <!-- SVG Smooth MA Lines (Abstract Mock, scales dynamically) -->
+                <svg id="chart-ma-svg" class="absolute inset-0 w-full h-full pointer-events-none z-10" preserveaspectratio="none" viewbox="0 0 1000 500">
+                    <!-- 5MA -->
+                    <path id="path-ma5" class="opacity-80 transition-all duration-500" d="M 0 350 Q 250 400, 500 200 T 1000 150" fill="none" stroke="#34D399" stroke-linecap="round" stroke-width="2"></path>
+                    <!-- 10MA -->
+                    <path id="path-ma10" class="opacity-80 transition-all duration-500" d="M 0 320 Q 300 380, 600 250 T 1000 180" fill="none" stroke="#FBBF24" stroke-linecap="round" stroke-width="2"></path>
+                    <!-- 20MA -->
+                    <path id="path-ma20" class="opacity-80 transition-all duration-500" d="M 0 300 Q 400 350, 700 280 T 1000 220" fill="none" stroke="#FB7185" stroke-linecap="round" stroke-width="2"></path>
+                    <!-- 60MA -->
+                    <path id="path-ma60" class="opacity-90 transition-all duration-500" d="M 0 250 Q 500 300, 800 290 T 1000 250" fill="none" stroke="#818CF8" stroke-linecap="round" stroke-width="3"></path>
+                </svg>
+            </div>
+            
+            <!-- Bottom Indicators (Volume & Technical Line) -->
+            <div class="h-28 flex flex-col gap-2 z-10">
+                <div class="flex justify-between items-center px-2">
+                    <div class="flex items-center gap-2">
+                        <span class="font-label-md text-label-md text-on-surface-variant dark:text-slate-400 font-bold">거래량</span>
+                        <button class="text-outline-variant hover:text-primary transition-colors" title="거래량 도움말">
+                            <span class="material-symbols-outlined text-[14px]">help</span>
+                        </button>
+                    </div>
+                    <span id="volume-val" class="font-label-md text-label-md text-on-surface-variant dark:text-slate-400">2,451,203</span>
+                </div>
+                <div class="flex-1 relative flex items-end justify-around px-2 md:px-8 border-b border-surface-container-highest/50 dark:border-white/10 pb-2">
+                    <!-- Volume Bars -->
+                    <div class="w-1.5 sm:w-2 md:w-3 bg-krx-down/40 h-[30%] rounded-t-sm"></div>
+                    <div class="w-1.5 sm:w-2 md:w-3 bg-krx-up/60 h-[70%] rounded-t-sm"></div>
+                    <div class="w-1.5 sm:w-2 md:w-3 bg-krx-down/50 h-[40%] rounded-t-sm"></div>
+                    <div class="w-1.5 sm:w-2 md:w-3 bg-krx-down/30 h-[20%] rounded-t-sm"></div>
+                    <div class="w-1.5 sm:w-2 md:w-3 bg-krx-up/80 h-[90%] rounded-t-sm"></div>
+                    <div class="w-1.5 sm:w-2 md:w-3 bg-krx-up/90 h-[100%] rounded-t-sm"></div>
+                    <div class="w-1.5 sm:w-2 md:w-3 bg-krx-up/70 h-[60%] rounded-t-sm"></div>
+                </div>
+                <!-- Technical Line (e.g. RSI or MACD mock) -->
+                <div class="h-6 relative w-full mt-1">
+                    <svg class="absolute inset-0 w-full h-full pointer-events-none" preserveaspectratio="none" viewbox="0 0 1000 50">
+                        <rect fill="#c4c5d8" class="opacity-20" height="1" width="1000" x="0" y="35"></rect>
+                        <rect fill="#c4c5d8" class="opacity-20" height="1" width="1000" x="0" y="15"></rect>
+                        <path d="M 0 40 Q 200 10, 400 30 T 800 5 T 1000 20" fill="none" stroke="#a3b2fe" stroke-width="1.5"></path>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Right Sidebar: Context Cards -->
+    <aside class="w-full lg:w-80 flex flex-col gap-card-gap">
+        <!-- 주식 날씨 요약 Card -->
+        <div class="glass-card rounded-2xl p-6 relative overflow-hidden group hover:-translate-y-1 transition-all duration-300">
+            <!-- Decorative blurred shape behind -->
+            <div class="absolute -top-10 -right-10 w-32 h-32 bg-krx-up/10 rounded-full blur-2xl group-hover:bg-krx-up/20 transition-colors duration-500"></div>
+            <div class="flex items-center gap-4 mb-6">
+                <div class="w-12 h-12 rounded-xl bg-surface-container dark:bg-[#1e222b] flex items-center justify-center text-primary dark:text-primary-container shadow-sm">
+                    <span id="weather-icon" class="material-symbols-outlined text-[28px]">wb_sunny</span>
+                </div>
+                <div>
+                    <h3 class="font-title-lg text-title-lg text-on-surface dark:text-[#f8fafc]">주식 날씨 요약</h3>
+                    <p class="font-body-md text-body-md text-on-surface-variant dark:text-slate-400 mt-0.5">최근 20일 기준 분석</p>
+                </div>
+            </div>
+            
+            <div class="flex flex-col gap-3">
+                <div id="weather-trend-card" class="bg-krx-up-bg dark:bg-krx-up/10 border border-krx-up/20 rounded-xl p-3 flex items-start gap-3 transition-colors duration-300">
+                    <span id="weather-trend-icon" class="material-symbols-outlined text-krx-up mt-0.5 text-[20px]">trending_up</span>
+                    <div>
+                        <span id="weather-trend-title" class="font-label-md text-label-md font-bold text-krx-up block mb-1">상승 추세 유지 중</span>
+                        <span id="weather-trend-desc" class="font-body-md text-body-md text-on-surface-variant dark:text-slate-400 text-[13px] leading-tight">단기 및 중기 이평선이 정배열을 형성하며 안정적인 우상향 흐름을 보이고 있습니다.</span>
+                    </div>
+                </div>
+                <div class="bg-surface-container-low dark:bg-[#1e222b] border border-surface-container-highest dark:border-white/5 rounded-xl p-3 flex items-start gap-3">
+                    <span class="material-symbols-outlined text-primary dark:text-primary-container mt-0.5 text-[20px]">bar_chart</span>
+                    <div>
+                        <span class="font-label-md text-label-md font-bold text-on-surface dark:text-slate-200 block mb-1">거래량 안정적</span>
+                        <span class="font-body-md text-body-md text-on-surface-variant dark:text-slate-400 text-[13px] leading-tight">상승 시 거래량이 동반되며, 조정 시 거래량이 감소하는 건전한 패턴입니다.</span>
+                    </div>
+                </div>
+            </div>
+            <button class="w-full mt-6 bg-primary dark:bg-primary-container text-on-primary dark:text-[#f8fafc] font-label-md text-label-md font-bold py-3 rounded-xl shadow-[0_4px_14px_rgba(10,64,226,0.3)] dark:shadow-[0_4px_14px_rgba(55,93,251,0.2)] hover:shadow-[0_6px_20px_rgba(10,64,226,0.4)] active:scale-[0.98] transition-all">
+                상세 리포트 보기
+            </button>
+        </div>
+        
+        <!-- Bento Box: Mini Stats (Generated for design fullness) -->
+        <div class="glass-card rounded-2xl p-5 flex flex-col gap-4">
+            <h4 class="font-label-md text-label-md font-bold text-on-surface-variant dark:text-slate-400">핵심 지표</h4>
+            <div class="grid grid-cols-2 gap-3">
+                <div class="bg-surface-container-low dark:bg-[#1e222b] rounded-xl p-3">
+                    <span class="font-label-md text-label-md text-on-surface-variant dark:text-slate-400 block mb-1">시가총액</span>
+                    <span id="stat-cap" class="font-body-lg text-body-lg font-bold text-on-surface dark:text-[#f8fafc]">170.7조</span>
+                </div>
+                <div class="bg-surface-container-low dark:bg-[#1e222b] rounded-xl p-3">
+                    <span class="font-label-md text-label-md text-on-surface-variant dark:text-slate-400 block mb-1">PER</span>
+                    <span id="stat-per" class="font-body-lg text-body-lg font-bold text-on-surface dark:text-[#f8fafc]">14.2x</span>
+                </div>
+                <div class="bg-surface-container-low dark:bg-[#1e222b] rounded-xl p-3">
+                    <span class="font-label-md text-label-md text-on-surface-variant dark:text-slate-400 block mb-1">외인소진율</span>
+                    <span id="stat-foreign" class="font-body-lg text-body-lg font-bold text-on-surface dark:text-[#f8fafc]">54.2%</span>
+                </div>
+                <div class="bg-surface-container-low dark:bg-[#1e222b] rounded-xl p-3">
+                    <span class="font-label-md text-label-md text-on-surface-variant dark:text-slate-400 block mb-1">52주 최고</span>
+                    <span id="stat-52h" class="font-body-lg text-body-lg font-bold text-on-surface dark:text-[#f8fafc]">243,000</span>
+                </div>
+            </div>
+        </div>
+    </aside>
+</div>
+
+<!-- JavaScript Interactivity -->
+<script>
+    // Theme Management
+    const themeToggleBtn = document.getElementById('theme-toggle-btn');
+    const themeIcon = document.getElementById('theme-icon');
+    const themeText = document.getElementById('theme-text');
+    
+    themeToggleBtn.addEventListener('click', () => {
+        const isDark = document.documentElement.classList.toggle('dark');
+        themeIcon.textContent = isDark ? 'light_mode' : 'dark_mode';
+        themeText.textContent = isDark ? '밝게' : '어둡게';
+    });
+    
+    // Mobile Drawer Logic
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const mobileDrawer = document.getElementById('mobile-drawer');
+    const closeDrawerBtn = document.getElementById('close-drawer-btn');
+    const drawerContent = mobileDrawer.querySelector('div');
+    
+    function openDrawer() {
+        mobileDrawer.classList.remove('opacity-0', 'pointer-events-none');
+        mobileDrawer.classList.add('opacity-100', 'pointer-events-auto');
+        drawerContent.classList.remove('-translate-x-full');
+    }
+    
+    function closeDrawer() {
+        mobileDrawer.classList.remove('opacity-100', 'pointer-events-auto');
+        mobileDrawer.classList.add('opacity-0', 'pointer-events-none');
+        drawerContent.classList.add('-translate-x-full');
+    }
+    
+    mobileMenuBtn.addEventListener('click', openDrawer);
+    closeDrawerBtn.addEventListener('click', closeDrawer);
+    mobileDrawer.addEventListener('click', (e) => {
+        if (e.target === mobileDrawer) closeDrawer();
+    });
+    
+    // Mobile Search Overlay Logic
+    const mobileSearchBtn = document.getElementById('mobile-search-btn');
+    const mobileSearchOverlay = document.getElementById('mobile-search-overlay');
+    const closeSearchBtn = document.getElementById('close-search-btn');
+    const mobileSearchInput = document.getElementById('mobile-search-input');
+    
+    function openMobileSearch() {
+        mobileSearchOverlay.classList.remove('opacity-0', 'pointer-events-none');
+        mobileSearchOverlay.classList.add('opacity-100', 'pointer-events-auto');
+        mobileSearchInput.focus();
+    }
+    
+    function closeMobileSearch() {
+        mobileSearchOverlay.classList.remove('opacity-100', 'pointer-events-auto');
+        mobileSearchOverlay.classList.add('opacity-0', 'pointer-events-none');
+    }
+    
+    mobileSearchBtn.addEventListener('click', openMobileSearch);
+    closeSearchBtn.addEventListener('click', closeMobileSearch);
+    
+    // Desktop Search Suggestions dropdown
+    const desktopSearchInput = document.getElementById('desktop-search-input');
+    const desktopSuggestions = document.getElementById('desktop-suggestions');
+    
+    desktopSearchInput.addEventListener('focus', () => {
+        desktopSuggestions.classList.remove('hidden');
+    });
+    
+    document.addEventListener('click', (e) => {
+        if (!desktopSearchInput.contains(e.target) && !desktopSuggestions.contains(e.target)) {
+            desktopSuggestions.classList.add('hidden');
+        }
+    });
+
+    // Timeframe toggle
+    const timeframeSlider = document.getElementById('timeframe-slider');
+    const tabDaily = document.getElementById('tab-daily');
+    const tabMin = document.getElementById('tab-min');
+    
+    function toggleTimeframe(type) {
+        if (type === '일봉') {
+            timeframeSlider.classList.remove('translate-x-full');
+            tabDaily.classList.add('font-bold', 'text-primary', 'dark:text-primary-container');
+            tabDaily.classList.remove('text-on-surface-variant', 'dark:text-slate-400');
+            tabMin.classList.remove('font-bold', 'text-primary', 'dark:text-primary-container');
+            tabMin.classList.add('text-on-surface-variant', 'dark:text-slate-400');
+        } else {
+            timeframeSlider.classList.add('translate-x-full');
+            tabMin.classList.add('font-bold', 'text-primary', 'dark:text-primary-container');
+            tabMin.classList.remove('text-on-surface-variant', 'dark:text-slate-400');
+            tabDaily.classList.remove('font-bold', 'text-primary', 'dark:text-primary-container');
+            tabDaily.classList.add('text-on-surface-variant', 'dark:text-slate-400');
+        }
+    }
+    
+    // MA line toggle (SVG opacity toggle)
+    const activeMAs = { ma5: true, ma10: true, ma20: true, ma60: true };
+    function toggleLine(maId) {
+        activeMAs[maId] = !activeMAs[maId];
+        const path = document.getElementById('path-' + maId);
+        const dot = document.getElementById('dot-' + maId);
+        
+        if (activeMAs[maId]) {
+            path.style.display = 'block';
+            dot.style.opacity = '1';
+        } else {
+            path.style.display = 'none';
+            dot.style.opacity = '0.3';
+        }
+    }
+    
+    // Control options checkboxes toggle
+    const optionStates = { trend: true, alltrend: false, high: false, low: true };
+    function toggleOption(opt) {
+        optionStates[opt] = !optionStates[opt];
+        const btn = document.getElementById('toggle-' + opt);
+        
+        // Toggle active styling
+        if (optionStates[opt]) {
+            btn.className = "px-3 py-1 bg-white dark:bg-slate-700 rounded-lg shadow-sm font-label-md text-label-md text-primary dark:text-[#f8fafc] font-bold border border-primary/10 dark:border-white/5 transition-all";
+        } else {
+            btn.className = "px-3 py-1 rounded-lg hover:bg-surface-container-high dark:hover:bg-slate-800 font-label-md text-label-md text-on-surface-variant dark:text-slate-400 transition-all";
+        }
+        
+        // Connect to chart visual effects
+        if (opt === 'high') {
+            document.getElementById('annotation-high').style.opacity = optionStates[opt] ? '1' : '0';
+        } else if (opt === 'low') {
+            document.getElementById('annotation-low').style.opacity = optionStates[opt] ? '1' : '0';
+        } else if (opt === 'trend') {
+            document.getElementById('chart-ma-svg').style.opacity = optionStates[opt] ? '1' : '0';
+        }
+    }
+    
+    // Initial states triggers
+    toggleOption('high'); // Start high as false, hide it
+    
+    // Candle count spin control
+    const candleCountInput = document.getElementById('candle-count-input');
+    function changeCandle(val) {
+        let count = parseInt(candleCountInput.value);
+        count = Math.max(100, Math.min(5000, count + val));
+        candleCountInput.value = count;
+    }
+    
+    // Interactive Stock Switching
+    const stockDatabase = {
+        'SK하이닉스': {
+            code: '000660',
+            price: '234,500',
+            diff: '4,500 (+1.96%)',
+            isUp: true,
+            high: '최고 2,900,000 (-12.58%)',
+            low: '최저 2,045,000 (18.58%)',
+            weatherTitle: '상승 추세 유지 중',
+            weatherDesc: '단기 및 중기 이평선이 정배열을 형성하며 안정적인 우상향 흐름을 보이고 있습니다.',
+            weatherIcon: 'wb_sunny',
+            weatherBgClass: 'bg-krx-up-bg dark:bg-krx-up/10 border border-krx-up/20',
+            cap: '170.7조',
+            per: '14.2x',
+            foreign: '54.2%',
+            h52: '243,000',
+            pricePercent: '40%',
+            vol: '2,451,203',
+            maSVGPaths: {
+                ma5: "M 0 350 Q 250 400, 500 200 T 1000 150",
+                ma10: "M 0 320 Q 300 380, 600 250 T 1000 180",
+                ma20: "M 0 300 Q 400 350, 700 280 T 1000 220",
+                ma60: "M 0 250 Q 500 300, 800 290 T 1000 250"
+            }
+        },
+        '삼성전자': {
+            code: '005930',
+            price: '78,200',
+            diff: '400 (-0.51%)',
+            isUp: false,
+            high: '최고 88,500 (-11.64%)',
+            low: '최저 72,100 (+8.46%)',
+            weatherTitle: '단기 횡보 국면',
+            weatherDesc: '이동평균선들이 수렴하며 좁은 박스권 거래량을 기록하고 있어 관망이 유효합니다.',
+            weatherIcon: 'filter_drama',
+            weatherBgClass: 'bg-surface-container dark:bg-slate-800 border border-surface-container-highest dark:border-white/5',
+            cap: '466.8조',
+            per: '9.8x',
+            foreign: '56.1%',
+            h52: '88,500',
+            pricePercent: '60%',
+            vol: '11,402,903',
+            maSVGPaths: {
+                ma5: "M 0 220 Q 300 200, 600 260 T 1000 250",
+                ma10: "M 0 230 Q 350 210, 650 240 T 1000 245",
+                ma20: "M 0 240 Q 400 230, 700 235 T 1000 240",
+                ma60: "M 0 250 Q 500 250, 800 240 T 1000 238"
+            }
+        },
+        'NAVER': {
+            code: '035420',
+            price: '185,400',
+            diff: '1,500 (+0.83%)',
+            isUp: true,
+            high: '최고 215,000 (-13.77%)',
+            low: '최저 171,000 (+8.42%)',
+            weatherTitle: '바닥 다지기 진행',
+            weatherDesc: '장기 하락 추세 이후 저점을 높여가며 완만한 회복세를 나타내고 있습니다.',
+            weatherIcon: 'cloud',
+            weatherBgClass: 'bg-krx-up-bg dark:bg-krx-up/10 border border-krx-up/20',
+            cap: '29.8조',
+            per: '22.4x',
+            foreign: '14.8%',
+            h52: '235,500',
+            pricePercent: '50%',
+            vol: '845,409',
+            maSVGPaths: {
+                ma5: "M 0 380 Q 200 320, 500 330 T 1000 300",
+                ma10: "M 0 390 Q 250 340, 550 350 T 1000 315",
+                ma20: "M 0 400 Q 300 360, 600 370 T 1000 330",
+                ma60: "M 0 420 Q 400 380, 700 390 T 1000 360"
+            }
+        }
+    };
+    
+    function selectStock(name, code, isUp, price, diff, upFlag) {
+        const data = stockDatabase[name];
+        if (!data) return;
+        
+        // Update Search input values
+        desktopSearchInput.value = `${name} (${code})`;
+        mobileSearchInput.value = `${name} (${code})`;
+        
+        // Update stock general info
+        document.getElementById('stock-name').textContent = name;
+        document.getElementById('stock-code').textContent = code;
+        
+        const priceEl = document.getElementById('stock-price');
+        priceEl.textContent = price;
+        
+        const diffEl = document.getElementById('stock-diff');
+        const diffIcon = document.getElementById('stock-diff-icon');
+        
+        // Adjust coloring classes based on Up/Down
+        if (upFlag) {
+            priceEl.className = "font-headline-md text-xl md:text-2xl text-krx-up font-bold";
+            diffEl.className = "font-label-md text-label-md text-krx-up bg-krx-up-bg dark:bg-krx-up/10 px-2 py-0.5 rounded-md flex items-center gap-0.5";
+            diffIcon.textContent = "arrow_drop_up";
+            document.getElementById('price-badge').className = "bg-krx-up text-white font-label-md text-[10px] md:text-label-md px-1.5 md:px-2 py-0.5 md:py-1 rounded-l-md shadow-sm z-10";
+            document.getElementById('price-line').className = "w-full border-b-2 border-dashed border-krx-up/50 absolute top-[" + data.pricePercent + "] flex justify-end items-center transition-all duration-500 pr-0";
+        } else {
+            priceEl.className = "font-headline-md text-xl md:text-2xl text-krx-down font-bold";
+            diffEl.className = "font-label-md text-label-md text-krx-down bg-krx-down-bg dark:bg-krx-down/10 px-2 py-0.5 rounded-md flex items-center gap-0.5";
+            diffIcon.textContent = "arrow_drop_down";
+            document.getElementById('price-badge').className = "bg-krx-down text-white font-label-md text-[10px] md:text-label-md px-1.5 md:px-2 py-0.5 md:py-1 rounded-l-md shadow-sm z-10";
+            document.getElementById('price-line').className = "w-full border-b-2 border-dashed border-krx-down/50 absolute top-[" + data.pricePercent + "] flex justify-end items-center transition-all duration-500 pr-0";
+        }
+        diffEl.innerHTML = `<span id="stock-diff-icon" class="material-symbols-outlined text-[14px]">${upFlag ? 'arrow_drop_up' : 'arrow_drop_down'}</span> ${diff}`;
+        
+        // Update Price Line badge text
+        document.getElementById('price-badge').textContent = price;
+        
+        // Update High/Low annotations text
+        document.getElementById('label-high').textContent = data.high;
+        document.getElementById('label-low').textContent = data.low;
+        
+        // Update weather cards info
+        document.getElementById('weather-icon').textContent = data.weatherIcon;
+        document.getElementById('weather-trend-title').textContent = data.weatherTitle;
+        document.getElementById('weather-trend-title').className = "font-label-md text-label-md font-bold block mb-1 " + (upFlag ? "text-krx-up" : "text-on-surface dark:text-slate-200");
+        document.getElementById('weather-trend-icon').textContent = upFlag ? "trending_up" : "trending_flat";
+        document.getElementById('weather-trend-icon').className = "material-symbols-outlined mt-0.5 text-[20px] " + (upFlag ? "text-krx-up" : "text-on-surface-variant dark:text-slate-400");
+        document.getElementById('weather-trend-desc').textContent = data.weatherDesc;
+        document.getElementById('weather-trend-card').className = data.weatherBgClass + " rounded-xl p-3 flex items-start gap-3 transition-colors duration-300";
+        
+        // Update stats
+        document.getElementById('stat-cap').textContent = data.cap;
+        document.getElementById('stat-per').textContent = data.per;
+        document.getElementById('stat-foreign').textContent = data.foreign;
+        document.getElementById('stat-52h').textContent = data.h52;
+        
+        // Update volume volume-val
+        document.getElementById('volume-val').textContent = data.vol;
+        
+        // Update MA SVGs paths
+        document.getElementById('path-ma5').setAttribute('d', data.maSVGPaths.ma5);
+        document.getElementById('path-ma10').setAttribute('d', data.maSVGPaths.ma10);
+        document.getElementById('path-ma20').setAttribute('d', data.maSVGPaths.ma20);
+        document.getElementById('path-ma60').setAttribute('d', data.maSVGPaths.ma60);
+        
+        // Close suggestions dropdown
+        desktopSuggestions.classList.add('hidden');
+    }
+</script>
+</body>
+</html>

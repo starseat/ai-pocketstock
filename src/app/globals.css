@@ -1,0 +1,98 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700&display=swap');
+
+:root {
+  /* Light Theme */
+  --bg-gradient: linear-gradient(135deg, #f7f9ff 0%, #ebeef3 100%);
+  --background: #f7f9ff;
+  --on-background: #181c20;
+  
+  --card-bg: rgba(255, 255, 255, 0.8);
+  --card-border: rgba(255, 255, 255, 0.5);
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+  
+  --primary: #0a40e2;
+  --primary-container: #375dfb;
+  --on-primary: #ffffff;
+  
+  --text-primary: #181c20;
+  --text-secondary: #444656;
+  --outline: #747687;
+  --outline-variant: #c4c5d8;
+  
+  --surface-container-low: #f1f4f9;
+  --surface-container-high: #e5e8ee;
+  --surface-container-highest: #e0e3e8;
+
+  /* Stock Colors */
+  --krx-up: #FF6B6B;
+  --krx-down: #4DABF7;
+  --krx-up-bg: rgba(255, 107, 107, 0.1);
+  --krx-down-bg: rgba(77, 171, 247, 0.1);
+}
+
+[data-theme="dark"] {
+  /* Dark Theme */
+  --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  --background: #0f172a;
+  --on-background: #f8fafc;
+  
+  --card-bg: rgba(30, 41, 59, 0.7);
+  --card-border: rgba(255, 255, 255, 0.08);
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  
+  --primary: #5882ff;
+  --primary-container: #1e3a8a;
+  --on-primary: #ffffff;
+  
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --outline: #94a3b8;
+  --outline-variant: #334155;
+  
+  --surface-container-low: #1e293b;
+  --surface-container-high: #334155;
+  --surface-container-highest: #475569;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--background);
+  background-image: var(--bg-gradient);
+  background-attachment: fixed;
+  color: var(--text-primary);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  min-h: 100vh;
+  overflow-x: hidden;
+  transition: background 0.3s, color 0.3s;
+}
+
+.glass-card {
+  background: var(--card-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--card-border);
+  box-shadow: var(--shadow);
+  border-radius: 1rem;
+  transition: all 0.3s ease;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--outline-variant);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--outline);
+}

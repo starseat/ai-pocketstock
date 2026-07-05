@@ -1,0 +1,205 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  height: 100%;
+}
+
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 16px;
+}
+
+@media (max-width: 640px) {
+  .toolbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+.leftControls {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.pillSelector {
+  display: flex;
+  position: relative;
+  background: var(--surface-container-low);
+  padding: 4px;
+  border-radius: 9999px;
+  width: 128px;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.03);
+}
+
+.pillSelector button {
+  flex: 1;
+  background: transparent;
+  border: none;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 6px 0;
+  border-radius: 9999px;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: all 0.2s;
+  z-index: 1;
+}
+
+.pillActive {
+  background: var(--card-bg) !important;
+  color: var(--primary) !important;
+  font-weight: 700 !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.maIndicators {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding-left: 24px;
+  border-left: 1px solid var(--outline-variant);
+}
+
+.maIndicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.maDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.rightControls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.toggleGroup {
+  display: flex;
+  background: var(--surface-container-low);
+  padding: 4px;
+  border-radius: 12px;
+  border: 1px solid var(--outline-variant);
+}
+
+.toggleBtn {
+  border: none;
+  background: transparent;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.toggleBtnActive {
+  background: var(--card-bg);
+  color: var(--primary);
+  font-weight: 700;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.chartCard {
+  position: relative;
+  flex: 1;
+  min-height: 480px;
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+}
+
+.chartHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 24px;
+}
+
+.stockName {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-family: 'Outfit', sans-serif;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.stockCode {
+  font-size: 18px;
+  font-weight: 400;
+  color: var(--text-secondary);
+}
+
+.priceWrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 6px;
+}
+
+.currentPrice {
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.changeBadge {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.up {
+  color: var(--krx-up);
+  background: var(--krx-up-bg);
+}
+
+.down {
+  color: var(--krx-down);
+  background: var(--krx-down-bg);
+}
+
+.flat {
+  color: var(--text-secondary);
+  background: var(--surface-container-high);
+}
+
+.chartWrapper {
+  flex: 1;
+  width: 100%;
+  position: relative;
+}
+
+.maDisabled {
+  opacity: 0.35;
+}
+
+.maIndicator {
+  transition: opacity 0.2s ease;
+}
+
+.maIndicator:hover {
+  opacity: 0.85;
+}
+
+.maDisabled:hover {
+  opacity: 0.6;
+}
