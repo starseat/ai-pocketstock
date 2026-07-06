@@ -17,6 +17,10 @@ interface StockData {
 interface StockChartProps {
   selectedStock?: StockData;
   theme: 'light' | 'dark';
+  activeTab: 'day' | 'minute';
+  setActiveTab: (tab: 'day' | 'minute') => void;
+  dayCandles: ChartCandle[];
+  minuteCandles: ChartCandle[];
 }
 
 interface ChartCandle {
@@ -26,107 +30,6 @@ interface ChartCandle {
   low: number;
   close: number;
   volume: number;
-}
-
-// 100일 분량의 모의 데이터 생성 함수
-function generateMockHistory(basePrice: number, seed: string): ChartCandle[] {
-  const data: ChartCandle[] = [];
-  const count = 150; // 150 영업일 분량
-  let currentPrice = basePrice * 0.85; // 150일 전 가격
-  
-  // 간단한 해시 함수를 통해 종목코드별 일관된 랜덤 시드 생성
-  let seedNum = 0;
-  for (let i = 0; i < seed.length; i++) {
-    seedNum += seed.charCodeAt(i);
-  }
-
-  const random = () => {
-    const x = Math.sin(seedNum++) * 10000;
-    return x - Math.floor(x);
-  };
-
-  // 150 영업일(주말 제외) 날짜 목록을 역순으로 수집 후 정렬
-  const dates: string[] = [];
-  const currentDate = new Date();
-  while (dates.length < count) {
-    const day = currentDate.getDay();
-    if (day !== 0 && day !== 6) {
-      dates.push(currentDate.toISOString().split('T')[0]);
-    }
-    currentDate.setDate(currentDate.getDate() - 1);
-  }
-  dates.reverse();
-
-  for (let i = 0; i < count; i++) {
-    const timeStr = dates[i];
-    const changePercent = (random() - 0.48) * 0.04; // -1.92% ~ +2.08% 변동
-    const open = Math.round(currentPrice);
-    const close = Math.round(currentPrice * (1 + changePercent));
-    const high = Math.round(Math.max(open, close) * (1 + random() * 0.015));
-    const low = Math.round(Math.min(open, close) * (1 - random() * 0.015));
-    const volume = Math.round(500000 + random() * 2000000);
-
-    data.push({
-      time: timeStr,
-      open,
-      high,
-      low,
-      close,
-      volume,
-    });
-
-    currentPrice = close;
-  }
-
-  return data;
-}
-
-// 150분 분량의 모의 분봉 데이터 생성 함수
-function generateMockMinutesHistory(basePrice: number, seed: string): ChartCandle[] {
-  const data: ChartCandle[] = [];
-  const count = 150; // 150분 분량
-  let currentPrice = basePrice * 0.99; // 150분 전 가격 (변동성을 작게 함)
-  
-  let seedNum = 0;
-  for (let i = 0; i < seed.length; i++) {
-    seedNum += seed.charCodeAt(i);
-  }
-
-  const random = () => {
-    const x = Math.sin(seedNum++) * 10000;
-    return x - Math.floor(x);
-  };
-
-  const now = new Date();
-  const times: number[] = [];
-  const currentTimestamp = Math.floor(now.getTime() / 60000) * 60; // 1분 단위 경계에 정렬
-  for (let i = 0; i < count; i++) {
-    times.push(currentTimestamp - (i * 60)); // 1분 간격
-  }
-  times.reverse();
-
-  for (let i = 0; i < count; i++) {
-    const timeVal = times[i];
-    const changePercent = (random() - 0.5) * 0.004; // -0.2% ~ +0.2% 변동
-    const open = Math.round(currentPrice);
-    const close = Math.round(currentPrice * (1 + changePercent));
-    const high = Math.round(Math.max(open, close) * (1 + random() * 0.0015));
-    const low = Math.round(Math.min(open, close) * (1 - random() * 0.0015));
-    const volume = Math.round(1000 + random() * 10000);
-
-    data.push({
-      time: timeVal,
-      open,
-      high,
-      low,
-      close,
-      volume,
-    });
-
-    currentPrice = close;
-  }
-
-  return data;
 }
 
 // 이동평균선(MA) 계산 함수
@@ -147,10 +50,16 @@ function calculateMA(data: ChartCandle[], period: number) {
   return maData;
 }
 
-export default function StockChart({ selectedStock, theme }: StockChartProps) {
+export default function StockChart({
+  selectedStock,
+  theme,
+  activeTab,
+  setActiveTab,
+  dayCandles,
+  minuteCandles,
+}: StockChartProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<any>(null);
-  const [activeTab, setActiveTab] = useState<'day' | 'minute'>('day');
   const [showTrend, setShowTrend] = useState<boolean>(true);
   const [candlesData, setCandlesData] = useState<ChartCandle[]>([]);
   const [enabledMAs, setEnabledMAs] = useState<Record<number, boolean>>({
@@ -160,58 +69,14 @@ export default function StockChart({ selectedStock, theme }: StockChartProps) {
     60: true,
   });
 
-  // 종목 또는 탭 변경 시 히스토리 데이터 초기화
+  // 외부(SWR)에서 들어온 데이터나 탭이 변경될 때 차트 데이터 동기화
   useEffect(() => {
-    if (selectedStock) {
-      if (activeTab === 'day') {
-        const mockHistory = generateMockHistory(selectedStock.price, selectedStock.code);
-        const todayStr = new Date().toISOString().split('T')[0];
-        
-        const updatedHistory = [...mockHistory];
-        const lastCandle = updatedHistory[updatedHistory.length - 1];
-        
-        const realTodayCandle = {
-          time: todayStr,
-          open: lastCandle.close, // 전일 종가를 시가로 가정
-          high: Math.max(lastCandle.close, selectedStock.price),
-          low: Math.min(lastCandle.close, selectedStock.price),
-          close: selectedStock.price,
-          volume: selectedStock.volume,
-        };
-
-        if (lastCandle.time === todayStr) {
-          updatedHistory[updatedHistory.length - 1] = realTodayCandle;
-        } else {
-          updatedHistory.push(realTodayCandle);
-        }
-
-        setCandlesData(updatedHistory);
-      } else {
-        // 분봉 데이터 생성
-        const mockHistory = generateMockMinutesHistory(selectedStock.price, selectedStock.code);
-        const updatedHistory = [...mockHistory];
-        const lastCandle = updatedHistory[updatedHistory.length - 1];
-        const nowSeconds = Math.floor(Date.now() / 60000) * 60; // 현재 분 단위로 맞춤
-        
-        const realMinuteCandle = {
-          time: nowSeconds,
-          open: lastCandle.close, // 전일 종가를 시가로 가정
-          high: Math.max(lastCandle.close, selectedStock.price),
-          low: Math.min(lastCandle.close, selectedStock.price),
-          close: selectedStock.price,
-          volume: selectedStock.volume,
-        };
-
-        if (lastCandle.time === nowSeconds) {
-          updatedHistory[updatedHistory.length - 1] = realMinuteCandle;
-        } else {
-          updatedHistory.push(realMinuteCandle);
-        }
-
-        setCandlesData(updatedHistory);
-      }
+    if (activeTab === 'day') {
+      setCandlesData(dayCandles);
+    } else {
+      setCandlesData(minuteCandles);
     }
-  }, [selectedStock?.code, activeTab]);
+  }, [dayCandles, minuteCandles, activeTab]);
 
   // 실시간 가격 변동 발생 시 마지막 캔들 업데이트
   useEffect(() => {

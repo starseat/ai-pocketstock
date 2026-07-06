@@ -16,26 +16,15 @@ interface StockData {
 
 interface StockSummaryProps {
   stock?: StockData;
+  metrics?: {
+    marketCap: string;
+    per: string;
+    foreignRatio: string;
+    high52: string;
+  } | null;
 }
 
-// 종목별 상세 지표 매핑 데이터
-const STOCK_METRICS_MAP: Record<
-  string,
-  { marketCap: string; per: string; foreignRatio: string; high52: string }
-> = {
-  '005930': { marketCap: '420조원', per: '12.5x', foreignRatio: '53.8%', high52: '88,500원' },
-  '000660': { marketCap: '170조원', per: '14.2x', foreignRatio: '54.2%', high52: '243,000원' },
-  '373220': { marketCap: '80조원', per: '55.4x', foreignRatio: '4.8%', high52: '620,000원' },
-  '207940': { marketCap: '70조원', per: '68.2x', foreignRatio: '10.5%', high52: '1,020,000원' },
-  '005380': { marketCap: '55조원', per: '5.2x', foreignRatio: '38.2%', high52: '285,000원' },
-  '000270': { marketCap: '45조원', per: '4.8x', foreignRatio: '41.5%', high52: '130,000원' },
-  '068270': { marketCap: '38조원', per: '42.1x', foreignRatio: '20.8%', high52: '220,000원' },
-  '105560': { marketCap: '32조원', per: '6.5x', foreignRatio: '58.1%', high52: '95,000원' },
-  '055550': { marketCap: '28조원', per: '5.9x', foreignRatio: '60.2%', high52: '62,000원' },
-  '005490': { marketCap: '30조원', per: '15.1x', foreignRatio: '28.5%', high52: '450,000원' },
-};
-
-export default function StockSummary({ stock }: StockSummaryProps) {
+export default function StockSummary({ stock, metrics }: StockSummaryProps) {
   if (!stock) {
     return (
       <aside className={styles.aside}>
@@ -48,11 +37,11 @@ export default function StockSummary({ stock }: StockSummaryProps) {
     );
   }
 
-  const metrics = STOCK_METRICS_MAP[stock.code] || {
-    marketCap: 'N/A',
-    per: 'N/A',
-    foreignRatio: 'N/A',
-    high52: 'N/A',
+  const displayMetrics = metrics || {
+    marketCap: '로드 중...',
+    per: '로드 중...',
+    foreignRatio: '로드 중...',
+    high52: '로드 중...',
   };
 
   const isUp = stock.direction === '2';
@@ -150,19 +139,19 @@ export default function StockSummary({ stock }: StockSummaryProps) {
         <div className={styles.statsGrid}>
           <div className={styles.statItem}>
             <span className={styles.statLabel}>시가총액</span>
-            <span className={styles.statValue}>{metrics.marketCap}</span>
+            <span className={styles.statValue}>{displayMetrics.marketCap}</span>
           </div>
           <div className={styles.statItem}>
             <span className={styles.statLabel}>PER</span>
-            <span className={styles.statValue}>{metrics.per}</span>
+            <span className={styles.statValue}>{displayMetrics.per}</span>
           </div>
           <div className={styles.statItem}>
             <span className={styles.statLabel}>외인소진율</span>
-            <span className={styles.statValue}>{metrics.foreignRatio}</span>
+            <span className={styles.statValue}>{displayMetrics.foreignRatio}</span>
           </div>
           <div className={styles.statItem}>
             <span className={styles.statLabel}>52주 최고</span>
-            <span className={styles.statValue}>{metrics.high52}</span>
+            <span className={styles.statValue}>{displayMetrics.high52}</span>
           </div>
         </div>
       </div>

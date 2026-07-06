@@ -14,6 +14,7 @@ export default function Dashboard() {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedCode, setSelectedCode] = useState<string>('000660'); // default SK하이닉스
   const [pollingInterval, setPollingInterval] = useState<number>(5000); // default 5초
+  const [activeTab, setActiveTab] = useState<'day' | 'minute'>('day');
 
   // 테마 초기화 및 변경
   useEffect(() => {
@@ -40,13 +41,27 @@ export default function Dashboard() {
     dedupingInterval: 2000,
   });
 
+  // 선택된 종목의 상세 데이터 (차트 이력 및 보조지표) 조회
+  const { data: detailData, error: detailError } = useSWR(
+    selectedCode ? `/api/stocks/detail?code=${selectedCode}` : null,
+    fetcher,
+    {
+      revalidateOnFocus: false,
+      dedupingInterval: 10000,
+    }
+  );
+
   const customStocks = data?.success ? data.customStocks : [];
   const top10Stocks = data?.success ? data.top10Stocks : [];
   const allStocks = [...customStocks, ...top10Stocks];
   const selectedStock = allStocks.find((s: any) => s.code === selectedCode) || allStocks[0];
 
+  const dayCandles = detailData?.success ? detailData.dayCandles : [];
+  const minuteCandles = detailData?.success ? detailData.minuteCandles : [];
+  const metrics = detailData?.success ? detailData.metrics : null;
+
   // 로딩 상태 및 에러 핸들링
-  const hasError = error || (data && !data.success);
+  const hasError = error || detailError || (data && !data.success);
 
   return (
     <>
@@ -108,12 +123,19 @@ export default function Dashboard() {
 
           {/* Center Column: Charts */}
           <div>
-            <StockChart selectedStock={selectedStock} theme={theme} />
+            <StockChart
+              selectedStock={selectedStock}
+              theme={theme}
+              activeTab={activeTab}
+              setActiveTab={setActiveTab}
+              dayCandles={dayCandles}
+              minuteCandles={minuteCandles}
+            />
           </div>
 
           {/* Right Column: Context summaries */}
           <div>
-            <StockSummary stock={selectedStock} />
+            <StockSummary stock={selectedStock} metrics={metrics} />
           </div>
         </div>
       </div>
