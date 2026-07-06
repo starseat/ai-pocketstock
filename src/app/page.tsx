@@ -14,7 +14,7 @@ export default function Dashboard() {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedCode, setSelectedCode] = useState<string>('000660'); // default SK하이닉스
   const [pollingInterval, setPollingInterval] = useState<number>(5000); // default 5초
-  const [activeTab, setActiveTab] = useState<'day' | 'minute'>('day');
+  const [activeTab, setActiveTab] = useState<'day' | 'week' | 'month' | 'minute'>('day');
 
   // 테마 초기화 및 변경
   useEffect(() => {
@@ -57,6 +57,8 @@ export default function Dashboard() {
   const selectedStock = allStocks.find((s: any) => s.code === selectedCode) || allStocks[0];
 
   const dayCandles = detailData?.success ? detailData.dayCandles : [];
+  const weekCandles = detailData?.success ? detailData.weekCandles : [];
+  const monthCandles = detailData?.success ? detailData.monthCandles : [];
   const minuteCandles = detailData?.success ? detailData.minuteCandles : [];
   const metrics = detailData?.success ? detailData.metrics : null;
 
@@ -129,6 +131,8 @@ export default function Dashboard() {
               activeTab={activeTab}
               setActiveTab={setActiveTab}
               dayCandles={dayCandles}
+              weekCandles={weekCandles}
+              monthCandles={monthCandles}
               minuteCandles={minuteCandles}
             />
           </div>

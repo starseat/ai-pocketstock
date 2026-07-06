@@ -56,10 +56,12 @@
 * **선정 이유**: 
   범용 차트 라이브러리(Chart.js, Recharts 등) 대비 **금융 시계열 및 캔들스틱(Candlestick) 데이터 표현에 최적화**되어 있으며, Canvas 기반 렌더링으로 500개 이상의 캔들 데이터도 렉(Lag) 없이 부드러운 스크롤/줌을 지원합니다.
 * **기능 구현 요건**:
-  * **Candlestick Series**: 한국 주식 시장 표준 색상(상승: 빨간색 `#EF4444`, 하락: 파란색 `#3B82F6`) 설정
-  * **Line Series (Moving Averages)**: 5, 10, 20, 60일 이동평균선(MA)을 서로 다른 색상의 라인 차트로 오버레이
+  * **다중 타임프레임 지원 (Timeframe Toggle)**: 일(Day), 주(Week), 월(Month) 단위를 선택할 수 있으며, 각 단위에 맞춰 캔들 데이터를 동적으로 로드 및 렌더링
+  * **Candlestick Series**: 한국 주식 시장 표준 색상(상승: 빨간색 `#FF6B6B`, 하락: 파란색 `#4DABF7`) 설정
+  * **Line Series (Moving Averages)**: 선택된 타임프레임에 대해 5, 10, 20, 60 단위의 이동평균선(MA)을 서로 다른 색상의 라인 차트로 오버레이 (개별 라인은 레전드 클릭을 통해 활성/비활성 제어 가능)
   * **Histogram Series (Volume)**: 하단에 별도 패널 혹은 오버레이 형태로 거래량(Volume) 바 배치
   * **Custom Markers**: 고점/저점 화살표 어노테이션 및 최저/최고가 말풍선 표시
+
 
 ### 2.4 CSS Modules & Glassmorphic 디자인 시스템
 * **선정 이유**: 

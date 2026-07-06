@@ -2,6 +2,40 @@ import { NextResponse } from 'next/server';
 
 const USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
 
+// 네이버 금융 외부 차트 API에서 timeframe별 캔들을 조회하여 가공하는 헬퍼 함수
+async function fetchCandles(code: string, timeframe: string, startTime: string, endTime: string): Promise<any[]> {
+  const url = `https://m.stock.naver.com/front-api/external/chart/domestic/info?symbol=${code}&requestType=1&startTime=${startTime}&endTime=${endTime}&timeframe=${timeframe}`;
+  try {
+    const res = await fetch(url, {
+      headers: { 'User-Agent': USER_AGENT, 'Referer': 'https://m.stock.naver.com/' },
+      next: { revalidate: 0 },
+    });
+    if (!res.ok) return [];
+
+    const text = await res.text();
+    const cleanedText = text.replace(/'/g, '"');
+    const rawData = JSON.parse(cleanedText);
+
+    if (Array.isArray(rawData) && rawData.length > 1) {
+      return rawData.slice(1).map((row: any) => {
+        const dateStr = row[0]; // YYYYMMDD
+        const formattedDate = `${dateStr.substring(0, 4)}-${dateStr.substring(4, 6)}-${dateStr.substring(6, 8)}`;
+        return {
+          time: formattedDate,
+          open: Number(row[1]),
+          high: Number(row[2]),
+          low: Number(row[3]),
+          close: Number(row[4]),
+          volume: Number(row[5]),
+        };
+      }).slice(-150); // 최근 150개 캔들만 리턴
+    }
+  } catch (err: any) {
+    console.error(`Failed to parse ${timeframe} stock candles:`, err.message);
+  }
+  return [];
+}
+
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -11,7 +45,7 @@ export async function GET(request: Request) {
       return NextResponse.json({ success: false, error: 'code parameter is required' }, { status: 400 });
     }
 
-    // 1. Calculate dates for daily chart (past 300 days)
+    // YYYYMMDD 포맷 구하기 (최근 300일 전 데이터 확보)
     const endDate = new Date();
     const startDate = new Date();
     startDate.setDate(endDate.getDate() - 300);
@@ -26,42 +60,17 @@ export async function GET(request: Request) {
     const startTime = formatDate(startDate);
     const endTime = formatDate(endDate);
 
-    const dayUrl = `https://m.stock.naver.com/front-api/external/chart/domestic/info?symbol=${code}&requestType=1&startTime=${startTime}&endTime=${endTime}&timeframe=day`;
     const minuteUrl = `https://api.stock.naver.com/chart/domestic/item/{code}/minute`.replace('{code}', code);
     const integrationUrl = `https://m.stock.naver.com/api/stock/{code}/integration`.replace('{code}', code);
 
-    // 2. Fetch day, minute, and integration details concurrently
-    const [dayRes, minuteRes, integrationRes] = await Promise.all([
-      fetch(dayUrl, { headers: { 'User-Agent': USER_AGENT, 'Referer': 'https://m.stock.naver.com/' }, next: { revalidate: 0 } }),
+    // 2. 일봉, 주봉, 월봉, 분봉 및 통합 지표를 동시 병렬 요청
+    const [dayCandles, weekCandles, monthCandles, minuteRes, integrationRes] = await Promise.all([
+      fetchCandles(code, 'day', startTime, endTime),
+      fetchCandles(code, 'week', startTime, endTime),
+      fetchCandles(code, 'month', startTime, endTime),
       fetch(minuteUrl, { headers: { 'User-Agent': USER_AGENT, 'Referer': 'https://m.stock.naver.com/' }, next: { revalidate: 0 } }),
       fetch(integrationUrl, { headers: { 'User-Agent': USER_AGENT, 'Referer': 'https://m.stock.naver.com/' }, next: { revalidate: 0 } }),
     ]);
-
-    // Parse Day Candles
-    let dayCandles: any[] = [];
-    if (dayRes.ok) {
-      const rawDayText = await dayRes.text();
-      try {
-        const cleanedText = rawDayText.replace(/'/g, '"');
-        const rawDayData = JSON.parse(cleanedText);
-        if (Array.isArray(rawDayData) && rawDayData.length > 1) {
-          dayCandles = rawDayData.slice(1).map((row: any) => {
-            const dateStr = row[0]; // YYYYMMDD
-            const formattedDate = `${dateStr.substring(0, 4)}-${dateStr.substring(4, 6)}-${dateStr.substring(6, 8)}`;
-            return {
-              time: formattedDate,
-              open: Number(row[1]),
-              high: Number(row[2]),
-              low: Number(row[3]),
-              close: Number(row[4]),
-              volume: Number(row[5]),
-            };
-          }).slice(-150); // Get last 150 daily candles
-        }
-      } catch (parseErr: any) {
-        console.error('Failed to parse daily stock candles:', parseErr.message);
-      }
-    }
 
     // Parse Minute Candles
     let minuteCandles: any[] = [];
@@ -77,7 +86,6 @@ export async function GET(request: Request) {
           const minute = parseInt(str.substring(10, 12));
           const second = parseInt(str.substring(12, 14)) || 0;
 
-          // Convert KST LocalDateTime string to UTC timestamp (timezone independent)
           const utcTime = Date.UTC(year, month, day, hour, minute, second) - 9 * 60 * 60 * 1000;
           return {
             time: Math.floor(utcTime / 1000),
@@ -89,7 +97,6 @@ export async function GET(request: Request) {
           };
         });
 
-        // De-accumulate volume for minute-specific volume bars
         minuteCandles = parsedMinutes.map((item: any, idx: number, arr: any[]) => {
           let volume = item.volume;
           if (idx > 0) {
@@ -137,6 +144,8 @@ export async function GET(request: Request) {
     return NextResponse.json({
       success: true,
       dayCandles,
+      weekCandles,
+      monthCandles,
       minuteCandles,
       metrics,
     });

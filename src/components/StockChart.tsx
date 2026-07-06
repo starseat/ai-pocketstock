@@ -17,9 +17,11 @@ interface StockData {
 interface StockChartProps {
   selectedStock?: StockData;
   theme: 'light' | 'dark';
-  activeTab: 'day' | 'minute';
-  setActiveTab: (tab: 'day' | 'minute') => void;
+  activeTab: 'day' | 'week' | 'month' | 'minute';
+  setActiveTab: (tab: 'day' | 'week' | 'month' | 'minute') => void;
   dayCandles: ChartCandle[];
+  weekCandles: ChartCandle[];
+  monthCandles: ChartCandle[];
   minuteCandles: ChartCandle[];
 }
 
@@ -56,6 +58,8 @@ export default function StockChart({
   activeTab,
   setActiveTab,
   dayCandles,
+  weekCandles,
+  monthCandles,
   minuteCandles,
 }: StockChartProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -73,10 +77,14 @@ export default function StockChart({
   useEffect(() => {
     if (activeTab === 'day') {
       setCandlesData(dayCandles);
+    } else if (activeTab === 'week') {
+      setCandlesData(weekCandles);
+    } else if (activeTab === 'month') {
+      setCandlesData(monthCandles);
     } else {
       setCandlesData(minuteCandles);
     }
-  }, [dayCandles, minuteCandles, activeTab]);
+  }, [dayCandles, weekCandles, monthCandles, minuteCandles, activeTab]);
 
   // 실시간 가격 변동 발생 시 마지막 캔들 업데이트
   useEffect(() => {
@@ -85,17 +93,14 @@ export default function StockChart({
         const next = [...prev];
         const lastIdx = next.length - 1;
         
-        if (activeTab === 'day') {
-          const todayStr = new Date().toISOString().split('T')[0];
-          if (next[lastIdx].time === todayStr) {
-            next[lastIdx] = {
-              ...next[lastIdx],
-              high: Math.max(next[lastIdx].high, selectedStock.price),
-              low: Math.min(next[lastIdx].low, selectedStock.price),
-              close: selectedStock.price,
-              volume: selectedStock.volume,
-            };
-          }
+        if (activeTab === 'day' || activeTab === 'week' || activeTab === 'month') {
+          next[lastIdx] = {
+            ...next[lastIdx],
+            high: Math.max(next[lastIdx].high, selectedStock.price),
+            low: Math.min(next[lastIdx].low, selectedStock.price),
+            close: selectedStock.price,
+            volume: selectedStock.volume,
+          };
         } else {
           // 분봉일 경우 마지막 캔들의 시간 범위 내에 있는지 확인
           const nowSeconds = Math.floor(Date.now() / 1000);
@@ -284,19 +289,31 @@ export default function StockChart({
       {/* Chart Toolbar */}
       <div className={`${styles.toolbar} glass-card`}>
         <div className={styles.leftControls}>
-          {/* 일봉/분봉 토글 */}
+          {/* 일/주/월/분봉 토글 */}
           <div className={styles.pillSelector}>
             <button
               className={activeTab === 'day' ? styles.pillActive : ''}
               onClick={() => setActiveTab('day')}
             >
-              일봉
+              일
+            </button>
+            <button
+              className={activeTab === 'week' ? styles.pillActive : ''}
+              onClick={() => setActiveTab('week')}
+            >
+              주
+            </button>
+            <button
+              className={activeTab === 'month' ? styles.pillActive : ''}
+              onClick={() => setActiveTab('month')}
+            >
+              월
             </button>
             <button
               className={activeTab === 'minute' ? styles.pillActive : ''}
               onClick={() => setActiveTab('minute')}
             >
-              분봉
+              분
             </button>
           </div>
 
@@ -309,7 +326,7 @@ export default function StockChart({
               [60, '#818CF8'],
             ] as const).map(([period, color]) => {
               const isEnabled = enabledMAs[period];
-              const suffix = activeTab === 'day' ? '일' : '분';
+              const suffix = activeTab === 'day' ? '일' : activeTab === 'week' ? '주' : activeTab === 'month' ? '월' : '분';
               return (
                 <div
                   key={period}
