@@ -6,6 +6,7 @@ import Header from '../components/Header';
 import StockList from '../components/StockList';
 import StockChart from '../components/StockChart';
 import StockSummary from '../components/StockSummary';
+import MobileSearchOverlay from '../components/MobileSearchOverlay';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -15,6 +16,7 @@ export default function Dashboard() {
   const [selectedCode, setSelectedCode] = useState<string>('000660'); // default SK하이닉스
   const [pollingInterval, setPollingInterval] = useState<number>(5000); // default 5초
   const [activeTab, setActiveTab] = useState<'day' | 'week' | 'month' | 'minute'>('day');
+  const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
 
   // 테마 초기화 및 변경
   useEffect(() => {
@@ -77,6 +79,15 @@ export default function Dashboard() {
         onChangeInterval={setPollingInterval}
         stocks={customStocks}
         onSelectStock={setSelectedCode}
+        onOpenSearch={() => setIsMobileSearchOpen(true)}
+      />
+
+      {/* 모바일 전체화면 검색 오버레이 */}
+      <MobileSearchOverlay
+        isOpen={isMobileSearchOpen}
+        onClose={() => setIsMobileSearchOpen(false)}
+        stocks={allStocks}
+        onSelect={setSelectedCode}
       />
 
       {/* Main Container */}

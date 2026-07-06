@@ -96,6 +96,29 @@
   gap: 12px;
 }
 
+.mobileSearchBtn {
+  border: none;
+  background: transparent;
+  padding: 6px;
+  border-radius: 10px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.mobileSearchBtn:hover {
+  background: var(--surface-container-high);
+}
+
+@media (min-width: 1025px) {
+  .mobileSearchBtn {
+    display: none;
+  }
+}
+
 /* 모바일: "갱신 주기" 텍스트 레이블 숨김 */
 .intervalLabel {
   font-size: 12px;

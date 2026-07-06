@@ -13,6 +13,7 @@ interface HeaderProps {
   onChangeInterval: (interval: number) => void;
   stocks: any[];
   onSelectStock: (code: string) => void;
+  onOpenSearch: () => void;
 }
 
 export default function Header({
@@ -24,6 +25,7 @@ export default function Header({
   onChangeInterval,
   stocks,
   onSelectStock,
+  onOpenSearch,
 }: HeaderProps) {
   const [isFocused, setIsFocused] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -93,6 +95,11 @@ export default function Header({
       </div>
 
       <div className={styles.actions}>
+        {/* 모바일 검색 돋보기 */}
+        <button className={styles.mobileSearchBtn} onClick={onOpenSearch}>
+          <Search size={20} />
+        </button>
+
         {/* Polling Interval Selector */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <span className={styles.intervalLabel}>갱신 주기</span>
